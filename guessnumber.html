@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guess Your Number (1–30)</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom right, #f0f9ff, #e0f2fe);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  .container {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+  }
+  h1 { margin-bottom: 10px; }
+  table {
+    margin: 15px auto;
+    border-collapse: collapse;
+  }
+  td {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: #f8fafc;
+  }
+  button {
+    margin: 8px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .yes { background: #0ea5e9; color: white; }
+  .no { background: #e2e8f0; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Think of a Number (1–30) 🪄</h1>
+  <p>For each set, answer if your number is shown.</p>
+
+  <div id="set-container"></div>
+  <div id="buttons">
+    <button class="yes" onclick="answer(1)">YES</button>
+    <button class="no" onclick="answer(0)">NO</button>
+  </div>
+
+  <h2 id="result" class="hidden"></h2>
+  <button id="restart" class="hidden" onclick="restart()">Play Again</button>
+</div>
+
+<script>
+let sets = [];
+let setIndex = 0;
+let number = 0;
+
+// Generate sets for numbers 1–30 (5 bits: 2⁵ = 32)
+for (let bit = 0; bit < 5; bit++) {
+  let set = [];
+  for (let n = 1; n <= 30; n++) {
+    if ((n >> bit) & 1) set.push(n);
+  }
+  sets.push(set);
+}
+
+function showSet() {
+  const container = document.getElementById("set-container");
+  container.innerHTML = "";
+  const table = document.createElement("table");
+  const set = sets[setIndex];
+  let i = 0;
+  while (i < set.length) {
+    const tr = document.createElement("tr");
+    for (let j = 0; j < 5 && i < set.length; j++, i++) {
+      const td = document.createElement("td");
+      td.textContent = set[i];
+      tr.appendChild(td);
+    }
+    table.appendChild(tr);
+  }
+  container.appendChild(table);
+}
+
+function answer(yes) {
+  if (yes) number += Math.pow(2, setIndex);
+  setIndex++;
+  if (setIndex < sets.length) {
+    showSet();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  document.getElementById("set-container").classList.add("hidden");
+  document.getElementById("buttons").classList.add("hidden");
+  const result = document.getElementById("result");
+  result.textContent = `Your number is: ${number}`;
+  result.classList.remove("hidden");
+  document.getElementById("restart").classList.remove("hidden");
+}
+
+function restart() {
+  setIndex = 0;
+  number = 0;
+  document.getElementById("set-container").classList.remove("hidden");
+  document.getElementById("buttons").classList.remove("hidden");
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("restart").classList.add("hidden");
+  showSet();
+}
+
+// start game
+showSet();
+</script>
+
+</body>
+</html>
